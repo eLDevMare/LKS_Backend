@@ -3,23 +3,22 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
- 
-Route::group([
-    'middleware' => 'api',
-    'prefix' => 'auth'
-], function ($router) {
-    // Route::post('/register', [AuthController::class, 'register'])->name('register');
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api')->name('logout');
-    Route::post('/refresh', [AuthController::class, 'refresh'])->middleware('auth:api')->name('refresh');
-    Route::post('/me', [AuthController::class, 'me'])->middleware('auth:api')->name('me');
+use App\Http\Controllers\SetsController;
 
-    Route::post('/course/post', [CourseController::class, 'addCourse'])->middleware('auth:api')->name('course.add');
-    Route::delete('/course/{slug}', [CourseController::class, 'deleteCourse'])->middleware('auth:api')->name('course.delete'); 
-    Route::get('/course', [CourseController::class, 'getAllCourse'])->middleware('auth:api')->name('course'); 
+Route::middleware('auth:sanctum')->group(function() {
+    Route::get('/user', [AuthController::class, 'getUser']);
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('/course', [CourseController::class, 'getAllCourse'])->name('course'); 
+    Route::get('/course/get/course', [CourseController::class, 'getMyCourse'])->name('course.me');
+    Route::get('/course/{slug}', [CourseController::class, 'getDetailCourse'])->name('course.detail');
+    Route::get('/course/other/course', [CourseController::class, 'getOtherCourse'])->name('course.other');
+    Route::post('/course/post', [CourseController::class, 'addCourse'])->name('course.add');
+    Route::post('/course/{slug}/register', [CourseController::class, 'courseRegister'])->name('course.register'); 
+    Route::delete('/course/{slug}', [CourseController::class, 'deleteCourse'])->name('course.delete'); 
+    Route::post('/course/{course_id}/sets', [SetsController::class, 'addSets'])->name('sets.add'); 
 });
 
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
